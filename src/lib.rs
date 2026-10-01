@@ -1,3 +1,5 @@
+//todo: /repair, /rename, /more, /bc/broadcast, /spawn, /setspawn
+
 mod command;
 mod events;
 mod commands;
