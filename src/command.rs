@@ -4,7 +4,7 @@ use pumpkin_plugin_api::commands::CommandHandler;
 use pumpkin_plugin_api::context::Permission;
 use pumpkin_plugin_api::permission::PermissionDefault;
 use pumpkin_plugin_api::player::PermissionLevel;
-use crate::commands::{AnvilHandler, BackHandler, CraftHandler, DynamicGamemodeHandler, FixedGamemodeHandler, FlyHandler, FlySpeedHandler, HealHandler, InvseeHandler, Mode, PingHandler};
+use crate::commands::{BackHandler, DynamicGamemodeHandler, FixedGamemodeHandler, FlyHandler, FlySpeedHandler, HealHandler, InvseeHandler, Mode, PingHandler};
 
 pub struct CommandRegistration<F> {
     pub names: &'static [&'static str],
@@ -57,30 +57,6 @@ pub fn commands() -> Vec<fn(&Context)> {
                         .execute(InvseeHandler),
                 ],
                 handler_builder: || InvseeHandler,
-            }
-                .register(ctx);
-        },
-        |ctx| {
-            CommandRegistration {
-                names: &["craft"],
-                description: "Open a portable crafting table",
-                permission: "melon:craft.use",
-                perm_description: "Allows opening portable crafting menu",
-                level: PermissionLevel::Two,
-                nodes: vec![],
-                handler_builder: || CraftHandler,
-            }
-                .register(ctx);
-        },
-        |ctx| {
-            CommandRegistration {
-                names: &["anvil"],
-                description: "Open a portable anvil",
-                permission: "melon:anvil.use",
-                perm_description: "Allows opening portable anvil menu",
-                level: PermissionLevel::Two,
-                nodes: vec![],
-                handler_builder: || AnvilHandler,
             }
                 .register(ctx);
         },
