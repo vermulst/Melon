@@ -1,13 +1,14 @@
-use pumpkin_plugin_api::{
-    command::{Arg, CommandSender, ConsumedArgs},
-    commands::CommandHandler,
-    common::Hand,
-    text::TextComponent,
-    wit::pumpkin::plugin::command::CommandError,
-    ItemStackExt, Result, Server,
-};
+use pumpkin_plugin_api::{command::{Arg, CommandSender, ConsumedArgs}, commands::CommandHandler, gui::{Gui, Screen}, text::TextComponent, wit::pumpkin::plugin::command::CommandError, Result, Server, ItemStack};
 
 pub struct InvseeHandler;
+
+impl InvseeHandler {
+    fn create_filler() -> ItemStack {
+        let mut filler = ItemStack::new("minecraft:gray_stained_glass_pane", 1);
+        filler.set_custom_name(Some(TextComponent::from_legacy_string_with_code("&r", '&')));
+        filler
+    }
+}
 
 impl CommandHandler for InvseeHandler {
     fn handle(
@@ -53,108 +54,76 @@ impl CommandHandler for InvseeHandler {
             }
         };
 
-        player.send_system_message(
-            TextComponent::from_legacy_string_with_code(
-                &format!("&6--- Inventory of &e{} &6---", target_player.get_name()),
-                '&',
-            ),
-            false,
+        let title = TextComponent::from_legacy_string_with_code(
+            &format!("&8Inv: &0{} (read-only)", target_player.get_name()),
+            '&',
         );
 
-        let inventory_items = target_player.get_inventory();
+        let mut gui = Gui::new(Screen::Generic9x6, title);
 
-        let main_hand_opt = target_player.get_item_in_hand(Hand::Right);
-        let off_hand_opt = target_player.get_item_in_hand(Hand::Left);
+        let target_inv = target_player.get_inventory();
 
-        let main_hand_str = main_hand_opt
-            .as_ref()
-            .and_then(|i| i.get_item())
-            .map(|i| i.to_string().to_lowercase())
-            .unwrap_or_else(|| "air".to_string());
-        let main_hand_count = main_hand_opt.as_ref().map_or(0, |i| i.get_count());
-
-        let off_hand_str = off_hand_opt
-            .as_ref()
-            .and_then(|i| i.get_item())
-            .map(|i| i.to_string().to_lowercase())
-            .unwrap_or_else(|| "air".to_string());
-        let off_hand_count = off_hand_opt.as_ref().map_or(0, |i| i.get_count());
-
-        player.send_system_message(
-            TextComponent::from_legacy_string_with_code(
-                &format!(
-                    "&eMain Hand: &f{} (x{})\n&eOff Hand: &f{} (x{})",
-                    main_hand_str, main_hand_count, off_hand_str, off_hand_count
-                ),
-                '&',
-            ),
-            false,
-        );
-
-        let armor_slots = ["Helmet", "Chestplate", "Leggings", "Boots"];
         let armor_items = [
-            inventory_items.get_helmet(),
-            inventory_items.get_chestplate(),
-            inventory_items.get_leggings(),
-            inventory_items.get_boots(),
+            target_inv.get_helmet(),
+            target_inv.get_chestplate(),
+            target_inv.get_leggings(),
+            target_inv.get_boots(),
         ];
 
-        player.send_system_message(
-            TextComponent::from_legacy_string_with_code("&6Armor:", '&'),
-            false,
-        );
-
-        for (index, label) in armor_slots.iter().enumerate() {
-            if let Some(item) = armor_items[index].as_ref() {
-                if item.get_count() > 0 {
-                    let item_name = item
-                        .get_item()
-                        .map(|i| i.to_string().to_lowercase())
-                        .unwrap_or_else(|| "unknown".to_string());
-                    player.send_system_message(
-                        TextComponent::from_legacy_string_with_code(
-                            &format!("  &e{}: &f{} (x{})", label, item_name, item.get_count()),
-                            '&',
-                        ),
-                        false,
-                    );
-                }
-            }
-        }
-
-        player.send_system_message(
-            TextComponent::from_legacy_string_with_code("&6Hotbar & Main Inventory:", '&'),
-            false,
-        );
-
-        let mut has_items = false;
-        let all_items = inventory_items.as_inventory().get_all_items();
-
-        for (slot, item_opt) in all_items.iter().enumerate() {
+        for (i, item_opt) in armor_items.into_iter().enumerate() {
             if let Some(item) = item_opt {
-                if item.get_count() > 0 {
-                    has_items = true;
-                    let item_name = item
-                        .get_item()
-                        .map(|i| i.to_string().to_lowercase())
-                        .unwrap_or_else(|| "unknown".to_string());
-                    player.send_system_message(
-                        TextComponent::from_legacy_string_with_code(
-                            &format!("  &7Slot {}: &f{} (x{})", slot, item_name, item.get_count()),
-                            '&',
-                        ),
-                        false,
-                    );
-                }
+                gui.set_item(i as u32, item);
             }
         }
 
-        if !has_items {
-            player.send_system_message(
-                TextComponent::from_legacy_string_with_code("  &7(Inventory empty)", '&'),
-                false,
-            );
+        if let Some(mainhand) = target_player.get_item_in_hand(pumpkin_plugin_api::common::Hand::Right) {
+            gui.set_item(4, mainhand);
         }
+
+        if let Some(offhand) = target_player.get_item_in_hand(pumpkin_plugin_api::common::Hand::Left) {
+            gui.set_item(5, offhand);
+        }
+
+        for slot in 6..9 {
+            gui.set_item(slot, Self::create_filler());
+        }
+
+        let armor_labels = ["&9Helmet", "&9Chestplate", "&9Leggings", "&9Boots"];
+        for i in 0..4 {
+            let mut label = ItemStack::new("minecraft:blue_stained_glass_pane", 1);
+            label.set_custom_name(Some(TextComponent::from_legacy_string_with_code(armor_labels[i], '&')));
+            gui.set_item((i + 9) as u32, label);
+        }
+
+        let selected_slot = target_player.get_selected_slot();
+        let mainhand_label_text = format!("&aMainhand (slot {})", selected_slot);
+
+        let mut mainhand_label = ItemStack::new("minecraft:green_stained_glass_pane", 1);
+        mainhand_label.set_custom_name(Some(TextComponent::from_legacy_string_with_code(&mainhand_label_text, '&')));
+        gui.set_item(13, mainhand_label);
+
+        let mut offhand_label = ItemStack::new("minecraft:purple_stained_glass_pane", 1);
+        offhand_label.set_custom_name(Some(TextComponent::from_legacy_string_with_code("&dOffhand", '&')));
+        gui.set_item(14, offhand_label);
+
+        for slot in 15..18 {
+            gui.set_item(slot, Self::create_filler());
+        }
+
+        let main_items = target_inv.as_inventory().get_all_items();
+
+        for (slot, item_opt) in main_items.into_iter().enumerate() {
+            if let Some(item) = item_opt {
+                let target_slot = match slot {
+                    0..=8 => 45 + slot,
+                    9..=35 => 18 + (slot - 9),
+                    _ => continue,
+                };
+                gui.set_item(target_slot as u32, item);
+            }
+        }
+
+        player.open_gui(gui);
 
         Ok(0)
     }
