@@ -1,4 +1,31 @@
-//todo: /repair, /rename, /more, /bc/broadcast, /spawn, /setspawn
+//todo:
+// /repair,
+// /rename,
+// /more,
+// /bc/broadcast,
+// /spawn,
+// /setspawn,
+// world,
+// warp/setwarp/delwarp,
+// tphere,
+// tpall,
+// tpoffline,
+// top/bottom,
+// skull,
+// lastseen,
+// removall <entity>,
+// msg/r,
+// playtime,
+// mute
+// motd
+// more
+// list
+// help
+// getpos
+// feed
+// exp
+// compass
+// afk 
 
 mod command;
 mod events;
