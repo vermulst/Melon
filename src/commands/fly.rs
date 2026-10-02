@@ -6,6 +6,7 @@ use pumpkin_plugin_api::{
 };
 use pumpkin_plugin_api::commands::CommandHandler;
 use pumpkin_plugin_api::wit::pumpkin::plugin::command::CommandError;
+use crate::commands::utils::ConsumedArgsExt;
 
 pub fn toggle_player_flight(player: &mut Player) {
     let flying = !player.is_flying();
@@ -34,30 +35,8 @@ impl CommandHandler for FlyHandler {
         _server: Server,
         args: ConsumedArgs,
     ) -> Result<i32, CommandError> {
-        let target_arg = args.get_value("target");
-
-        match target_arg {
-            pumpkin_plugin_api::command::Arg::Players(players) => {
-                if players.is_empty() {
-                    return Err(CommandError::CommandFailed(TextComponent::text("No target player found.")));
-                }
-
-                for mut target in players {
-                    toggle_player_flight(&mut target);
-                }
-
-                Ok(0)
-            }
-            _ => {
-                if let Some(mut player) = sender.as_player() {
-                    toggle_player_flight(&mut player);
-                    Ok(0)
-                } else {
-                    Err(CommandError::CommandFailed(TextComponent::text(
-                        "Console must specify a target player.",
-                    )))
-                }
-            }
-        }
+        args.run_for_targets_or_self(&sender, "target", |target| {
+            toggle_player_flight(target);
+        })
     }
 }

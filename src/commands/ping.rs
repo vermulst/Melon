@@ -6,6 +6,7 @@ use pumpkin_plugin_api::{
     wit::pumpkin::plugin::command::CommandError,
     Result, Server,
 };
+use crate::commands::utils::ConsumedArgsExt;
 
 pub fn send_ping_message(sender: &CommandSender, target: &Player, is_self: bool) {
     let ping = target.get_ping();
@@ -39,33 +40,10 @@ impl CommandHandler for PingHandler {
         _server: Server,
         args: ConsumedArgs,
     ) -> Result<i32, CommandError> {
-        match args.get_value("target") {
-            Arg::Players(players) => {
-                if players.is_empty() {
-                    return Err(CommandError::CommandFailed(
-                        TextComponent::from_legacy_string_with_code("&cNo target player found.", '&'),
-                    ));
-                }
-
-                for target in players {
-                    send_ping_message(&sender, &target, false);
-                }
-
-                Ok(0)
-            }
-            _ => {
-                if let Some(player) = sender.as_player() {
-                    send_ping_message(&sender, &player, true);
-                    Ok(0)
-                } else {
-                    Err(CommandError::CommandFailed(
-                        TextComponent::from_legacy_string_with_code(
-                            "&cConsole must specify a target player.",
-                            '&',
-                        ),
-                    ))
-                }
-            }
-        }
+        let sender_id = sender.as_player().map(|p| p.get_id().to_string());
+        args.run_for_targets_or_self(&sender, "target", |target| {
+            let is_self = sender_id.as_deref() == Some(&target.get_id().to_string());
+            send_ping_message(&sender, target, is_self);
+        })
     }
 }

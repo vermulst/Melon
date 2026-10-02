@@ -1,4 +1,5 @@
 use pumpkin_plugin_api::{command::{Arg, CommandSender, ConsumedArgs}, commands::CommandHandler, gui::{Gui, Screen}, text::TextComponent, wit::pumpkin::plugin::command::CommandError, Result, Server, ItemStack};
+use crate::commands::utils::{CommandSenderExt, ConsumedArgsExt};
 
 pub struct InvseeHandler;
 
@@ -17,42 +18,8 @@ impl CommandHandler for InvseeHandler {
         _server: Server,
         args: ConsumedArgs,
     ) -> Result<i32, CommandError> {
-        let player = match sender.as_player() {
-            Some(p) => p,
-            None => {
-                return Err(CommandError::CommandFailed(
-                    TextComponent::from_legacy_string_with_code(
-                        "&cConsole cannot execute /invsee.",
-                        '&',
-                    ),
-                ));
-            }
-        };
-
-        let target_arg = args.get_value("target");
-
-        let target_player = match target_arg {
-            Arg::Players(players) => {
-                if let Some(target) = players.into_iter().next() {
-                    target
-                } else {
-                    return Err(CommandError::CommandFailed(
-                        TextComponent::from_legacy_string_with_code(
-                            "&cNo target player found.",
-                            '&',
-                        ),
-                    ));
-                }
-            }
-            _ => {
-                return Err(CommandError::CommandFailed(
-                    TextComponent::from_legacy_string_with_code(
-                        "&cUsage: /invsee <player>",
-                        '&',
-                    ),
-                ));
-            }
-        };
+        let mut player = sender.require_player("invsee")?;
+        let target_player = args.require_target_player()?;
 
         let title = TextComponent::from_legacy_string_with_code(
             &format!("&8Inv: &0{} (read-only)", target_player.get_name()),

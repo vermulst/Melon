@@ -6,6 +6,7 @@ use pumpkin_plugin_api::{
     wit::pumpkin::plugin::command::CommandError,
     Result, Server,
 };
+use crate::commands::utils::CommandSenderExt;
 
 pub struct BackHandler;
 
@@ -16,18 +17,7 @@ impl CommandHandler for BackHandler {
         server: Server,
         _args: ConsumedArgs,
     ) -> Result<i32, CommandError> {
-        let mut player = match sender.as_player() {
-            Some(p) => p,
-            None => {
-                return Err(CommandError::CommandFailed(
-                    TextComponent::from_legacy_string_with_code(
-                        "&cConsole cannot execute /back.",
-                        '&',
-                    ),
-                ));
-            }
-        };
-
+        let mut player = sender.require_player("back")?;
         let uuid = player.get_id();
 
         let previous_loc = match TELEPORT_MANAGER.get_back_location(&uuid.to_string()) {

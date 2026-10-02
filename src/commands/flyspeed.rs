@@ -7,6 +7,7 @@ use pumpkin_plugin_api::{
     Result, Server,
 };
 use pumpkin_plugin_api::command_wit::Number;
+use crate::commands::utils::ConsumedArgsExt;
 
 fn parse_speed_arg(args: &ConsumedArgs) -> Option<f32> {
     match args.get_value("speed") {
@@ -59,33 +60,8 @@ impl CommandHandler for FlySpeedHandler {
             }
         };
 
-        match args.get_value("target") {
-            Arg::Players(players) => {
-                if players.is_empty() {
-                    return Err(CommandError::CommandFailed(
-                        TextComponent::from_legacy_string_with_code("&cNo target player found.", '&'),
-                    ));
-                }
-
-                for mut target in players {
-                    set_player_fly_speed(&mut target, speed);
-                }
-
-                Ok(0)
-            }
-            _ => {
-                if let Some(mut player) = sender.as_player() {
-                    set_player_fly_speed(&mut player, speed);
-                    Ok(0)
-                } else {
-                    Err(CommandError::CommandFailed(
-                        TextComponent::from_legacy_string_with_code(
-                            "&cConsole must specify a target player.",
-                            '&',
-                        ),
-                    ))
-                }
-            }
-        }
+        args.run_for_targets_or_self(&sender, "target", |target| {
+            set_player_fly_speed(target, speed);
+        })
     }
 }

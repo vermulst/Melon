@@ -6,6 +6,9 @@ pub mod heal;
 pub mod ping;
 pub mod teleport;
 mod invsee;
+mod repair;
+mod rename;
+mod utils;
 
 pub use back::BackHandler;
 pub use fly::FlyHandler;
@@ -15,3 +18,4 @@ pub use heal::HealHandler;
 pub use ping::PingHandler;
 pub use teleport::{BackLocation, TeleportManager, TELEPORT_MANAGER};
 pub use invsee::InvseeHandler;
+pub use rename::RenameHandler;

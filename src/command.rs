@@ -4,7 +4,7 @@ use pumpkin_plugin_api::commands::CommandHandler;
 use pumpkin_plugin_api::context::Permission;
 use pumpkin_plugin_api::permission::PermissionDefault;
 use pumpkin_plugin_api::player::PermissionLevel;
-use crate::commands::{BackHandler, DynamicGamemodeHandler, FixedGamemodeHandler, FlyHandler, FlySpeedHandler, HealHandler, InvseeHandler, Mode, PingHandler};
+use crate::commands::{BackHandler, DynamicGamemodeHandler, FixedGamemodeHandler, FlyHandler, FlySpeedHandler, HealHandler, InvseeHandler, Mode, PingHandler, RenameHandler};
 
 pub struct CommandRegistration<F> {
     pub names: &'static [&'static str],
@@ -215,6 +215,21 @@ pub fn commands() -> Vec<fn(&Context)> {
                 level: PermissionLevel::Zero,
                 nodes: vec![],
                 handler_builder: || BackHandler,
+            }
+                .register(ctx);
+        },
+        |ctx| {
+            CommandRegistration {
+                names: &["rename"],
+                description: "Rename the item in your main hand",
+                permission: "melon:rename.use",
+                perm_description: "Allows renaming items",
+                level: PermissionLevel::Two,
+                nodes: vec![
+                    CommandNode::argument("name", &ArgumentType::String(StringType::Greedy))
+                        .execute(RenameHandler),
+                ],
+                handler_builder: || RenameHandler,
             }
                 .register(ctx);
         },

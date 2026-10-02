@@ -1,5 +1,5 @@
 //todo:
-// /repair,
+// /repair, x
 // /rename,
 // /more,
 // /bc/broadcast,
@@ -25,7 +25,7 @@
 // feed
 // exp
 // compass
-// afk 
+// afk
 
 mod command;
 mod events;
