@@ -9,10 +9,16 @@ pub struct RenameHandler;
 
 
 impl CommandHandler for RenameHandler {
-    fn handle(&self, sender: CommandSender, server: Server, args: ConsumedArgs) -> pumpkin_plugin_api::Result<i32, CommandError> {
+    fn handle(
+        &self,
+        sender: CommandSender,
+        _server: Server,
+        args: ConsumedArgs,
+    ) -> pumpkin_plugin_api::Result<i32, CommandError> {
         let mut player = sender.require_player("rename")?;
         let mut item = player.require_main_hand()?;
-        let new_name = match args.get_value("name") {
+
+        let raw_name = match args.get_value("name") {
             Arg::Simple(s) => s,
             _ => {
                 return Err(CommandError::CommandFailed(
@@ -23,9 +29,12 @@ impl CommandHandler for RenameHandler {
                 ));
             }
         };
-        let formatted_name = TextComponent::from_legacy_string_with_code(&new_name, '&');
+
+        let formatted_name = TextComponent::from_legacy_string_with_code(&raw_name, '&');
         item.set_custom_name(Some(formatted_name));
+
         player.set_item_in_hand(Hand::Right, Some(item));
+
         player.send_system_message(
             TextComponent::from_legacy_string_with_code(
                 "&aItem renamed successfully.&r",
@@ -33,7 +42,6 @@ impl CommandHandler for RenameHandler {
             ),
             true,
         );
-
 
         Ok(0)
     }
