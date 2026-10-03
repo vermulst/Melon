@@ -27,7 +27,6 @@ mod motd;
 mod warp;
 mod removeall;
 mod list;
-mod afk;
 mod help;
 mod world;
 
@@ -58,6 +57,5 @@ pub use motd::MotdHandler;
 pub use warp::{SetWarpHandler, DelWarpHandler, WarpHandler, WarpNameSuggestions};
 pub use removeall::{RemoveAllHandler, RemoveAllSuggestions};
 pub use list::ListHandler;
-pub use afk::AfkHandler;
 pub use help::HelpHandler;
 pub use world::WorldHandler;

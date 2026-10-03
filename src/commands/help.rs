@@ -6,7 +6,6 @@ use pumpkin_plugin_api::{
 };
 
 const COMMANDS: &[(&str, &str)] = &[
-    ("afk",        "Toggle your AFK status"),
     ("back",       "Return to your previous location"),
     ("bottom",     "Teleport to the lowest safe surface"),
     ("broadcast",  "Broadcast a message to all players"),

@@ -4,7 +4,40 @@ use pumpkin_plugin_api::commands::CommandHandler;
 use pumpkin_plugin_api::context::Permission;
 use pumpkin_plugin_api::permission::PermissionDefault;
 use pumpkin_plugin_api::player::PermissionLevel;
-use crate::commands::{AfkHandler, BackHandler, BottomHandler, BroadcastHandler, CompassHandler, DelWarpHandler, DynamicGamemodeHandler, FeedHandler, FixedGamemodeHandler, FlyHandler, FlySpeedHandler, GetPosHandler, HealHandler, HelpHandler, InvseeHandler, ListHandler, Mode, MoreHandler, MotdHandler, MuteHandler, PingHandler, PlaytimeHandler, ReloadHandler, RemoveAllHandler, RemoveAllSuggestions, RenameHandler, SetSpawnHandler, SetWarpHandler, SpawnHandler, TopHandler, TpAllHandler, TpHereHandler, WarpHandler, WarpNameSuggestions, WorldHandler};
+use crate::commands::{
+    BackHandler,
+    BottomHandler,
+    BroadcastHandler,
+    CompassHandler,
+    DelWarpHandler,
+    DynamicGamemodeHandler,
+    FeedHandler,
+    FixedGamemodeHandler,
+    FlyHandler,
+    FlySpeedHandler,
+    GetPosHandler,
+    HealHandler,
+    HelpHandler,
+    InvseeHandler,
+    ListHandler,
+    Mode,
+    MoreHandler,
+    MotdHandler,
+    MuteHandler,
+    PingHandler,
+    PlaytimeHandler,
+    ReloadHandler,
+    RemoveAllHandler, RemoveAllSuggestions,
+    RenameHandler,
+    SetSpawnHandler,
+    SetWarpHandler,
+    SpawnHandler,
+    TopHandler,
+    TpAllHandler,
+    TpHereHandler,
+    WarpHandler, WarpNameSuggestions,
+    WorldHandler
+};
 use crate::commands::mute::DurationSuggestions;
 
 pub struct CommandRegistration<F> {
@@ -511,18 +544,6 @@ pub fn commands() -> Vec<fn(&Context)> {
                 level: PermissionLevel::Zero,
                 nodes: vec![],
                 handler_builder: || ListHandler,
-            }
-                .register(ctx);
-        },
-        |ctx| {
-            CommandRegistration {
-                names: &["afk", "away"],
-                description: "Toggle your AFK status",
-                permission: "melon:afk.use",
-                perm_description: "Allows toggling AFK",
-                level: PermissionLevel::Zero,
-                nodes: vec![],
-                handler_builder: || AfkHandler,
             }
                 .register(ctx);
         },
