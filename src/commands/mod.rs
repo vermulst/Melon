@@ -28,7 +28,6 @@ mod warp;
 mod removeall;
 mod list;
 mod help;
-mod world;
 
 pub use back::BackHandler;
 pub use fly::FlyHandler;
@@ -58,4 +57,3 @@ pub use warp::{SetWarpHandler, DelWarpHandler, WarpHandler, WarpNameSuggestions}
 pub use removeall::{RemoveAllHandler, RemoveAllSuggestions};
 pub use list::ListHandler;
 pub use help::HelpHandler;
-pub use world::WorldHandler;

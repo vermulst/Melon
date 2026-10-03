@@ -36,7 +36,6 @@ use crate::commands::{
     TpAllHandler,
     TpHereHandler,
     WarpHandler, WarpNameSuggestions,
-    WorldHandler
 };
 use crate::commands::mute::DurationSuggestions;
 
@@ -556,21 +555,6 @@ pub fn commands() -> Vec<fn(&Context)> {
                 level: PermissionLevel::Zero,
                 nodes: vec![],
                 handler_builder: || HelpHandler,
-            }
-                .register(ctx);
-        },
-        |ctx| {
-            CommandRegistration {
-                names: &["world"],
-                description: "Teleport to another world's spawn",
-                permission: "melon:world.use",
-                perm_description: "Allows switching worlds",
-                level: PermissionLevel::Two,
-                nodes: vec![
-                    CommandNode::argument("name", &ArgumentType::String(StringType::SingleWord))
-                        .execute(WorldHandler),
-                ],
-                handler_builder: || WorldHandler,
             }
                 .register(ctx);
         },
